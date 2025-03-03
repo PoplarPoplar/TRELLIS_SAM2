@@ -396,3 +396,13 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+#自己添加
+.vscode/
+assets/
+Output/
+Output_multi
+path/to
+cuda_11.8.0_520.61.05_linux.run
+Output_multi.zip
+Output.zip

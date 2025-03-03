@@ -41,7 +41,9 @@ def from_pretrained(path: str, **kwargs):
     import os
     import json
     from safetensors.torch import load_file
-    is_local = os.path.exists(f"{path}.json") and os.path.exists(f"{path}.safetensors")
+    #print(f"{path}.json")
+    #print(f"{path}.safetensors")
+    is_local = os.path.exists(f"{path}.json") and os.path.exists(f"{path}.safetensors")#
 
     if is_local:
         config_file = f"{path}.json"

@@ -44,7 +44,7 @@ class TrellisImageTo3DPipeline(Pipeline):
         self.slat_normalization = slat_normalization
         self.rembg_session = None
         self._init_image_cond_model(image_cond_model)
-
+    ###这里输出
     @staticmethod
     def from_pretrained(path: str) -> "TrellisImageTo3DPipeline":
         """
@@ -75,6 +75,7 @@ class TrellisImageTo3DPipeline(Pipeline):
         Initialize the image conditioning model.
         """
         dinov2_model = torch.hub.load('facebookresearch/dinov2', name, pretrained=True)
+        #dinov2_model = torch.load('/home/liu/code/TRELLIS/path/to/dinov2_vitl14_reg4.pth')
         dinov2_model.eval()
         self.models['image_cond_model'] = dinov2_model
         transform = transforms.Compose([

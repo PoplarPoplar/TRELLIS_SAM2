@@ -1,0 +1,75 @@
+import os
+import imageio
+import time
+from PIL import Image
+from trellis.pipelines import TrellisImageTo3DPipeline
+from trellis.utils import render_utils, postprocessing_utils
+
+# Load a pipeline from a model folder or a Hugging Face model hub.
+pipeline = TrellisImageTo3DPipeline.from_pretrained("/home/liu/code/TRELLIS/path/to/TRELLIS-image-large")
+pipeline.cuda()
+
+# Define the folder containing images
+image_folder = "assets/flower"  # 修改为你的图像文件夹路径
+
+# Get all image files in the folder
+image_files = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg'))]
+
+total_time_start = time.time()  # Start total timing
+
+for image_file in image_files:
+    # Start timing for each image
+    single_start_time = time.time()
+    
+    # Construct the full image path
+    image_path = os.path.join(image_folder, image_file)
+    image = Image.open(image_path)
+
+    # Extract the input folder name
+    input_folder_name = os.path.basename(os.path.dirname(image_path))
+
+    # Create output directory based on the input folder name and the image name
+    image_name = os.path.splitext(os.path.basename(image_path))[0]
+    output_dir = os.path.join("Output", input_folder_name, image_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Output the output directory path
+    print(f"Processing image: {image_path}")
+    print(f"Output directory path: {output_dir}")
+
+    # Run the pipeline
+    outputs = pipeline.run(
+        image,
+        seed=1,
+    )
+
+    # Render the outputs and save videos
+    video = render_utils.render_video(outputs['gaussian'][0])['color']
+    imageio.mimsave(os.path.join(output_dir, f"{image_name}_gs.mp4"), video, fps=30)
+    video = render_utils.render_video(outputs['radiance_field'][0])['color']
+    imageio.mimsave(os.path.join(output_dir, f"{image_name}_rf.mp4"), video, fps=30)
+    video = render_utils.render_video(outputs['mesh'][0])['normal']
+    imageio.mimsave(os.path.join(output_dir, f"{image_name}_mesh.mp4"), video, fps=30)
+
+    # GLB files can be extracted from the outputs
+    glb = postprocessing_utils.to_glb(
+        outputs['gaussian'][0],
+        outputs['mesh'][0],
+        simplify=0.95,
+        texture_size=1024,
+    )
+    glb.export(os.path.join(output_dir, f"{image_name}.glb"))
+
+    # Save Gaussians as PLY files
+    outputs['gaussian'][0].save_ply(os.path.join(output_dir, f"{image_name}.ply"))
+
+    # End timing for each image and print the time taken
+    single_end_time = time.time()
+    single_total_time = single_end_time - single_start_time
+    print(f"Finished processing image: {image_path}")
+    print(f"Time taken for {image_name}: {single_total_time:.2f} seconds\n")
+
+# End total timing and print the total time taken
+total_end_time = time.time()
+total_time_taken = total_end_time - total_time_start
+print(f"Total time taken for all images: {total_time_taken:.2f} seconds")

@@ -17,7 +17,7 @@ class Pipeline:
         self.models = models
         for model in self.models.values():
             model.eval()
-
+    ####这个
     @staticmethod
     def from_pretrained(path: str) -> "Pipeline":
         """

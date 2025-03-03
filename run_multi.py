@@ -16,11 +16,23 @@ pipeline = TrellisImageTo3DPipeline.from_pretrained("/home/liu/code/TRELLIS/path
 pipeline.cuda()
 
 # Load an image
-images = [
-    Image.open("assets/example_multi_image/character_1.png"),
-    Image.open("assets/example_multi_image/character_2.png"),
-    Image.open("assets/example_multi_image/character_3.png"),
+'''image_paths = [
+    "assets/example_multi_image/yoimiya_1.png",
+    "assets/example_multi_image/yoimiya_2.png",
+    "assets/example_multi_image/yoimiya_3.png"
+]'''
+image_paths = [
+    "assets/multi/mouse1.jpg",
+    "assets/multi/mouse2.jpg",
+    "assets/multi/mouse3.jpg"
 ]
+images = [Image.open(img_path) for img_path in image_paths]
+
+# Extract the common part of the image names (before the numbers)
+image_name = os.path.commonprefix([os.path.splitext(os.path.basename(img_path))[0] for img_path in image_paths])
+
+output_dir = os.path.join("Output_multi", image_name)
+os.makedirs(output_dir, exist_ok=True)
 
 # Run the pipeline
 outputs = pipeline.run_multi_image(
@@ -44,4 +56,6 @@ outputs = pipeline.run_multi_image(
 video_gs = render_utils.render_video(outputs['gaussian'][0])['color']
 video_mesh = render_utils.render_video(outputs['mesh'][0])['normal']
 video = [np.concatenate([frame_gs, frame_mesh], axis=1) for frame_gs, frame_mesh in zip(video_gs, video_mesh)]
-imageio.mimsave("sample_multi.mp4", video, fps=30)
+
+# Save the video to the output folder
+imageio.mimsave(os.path.join(output_dir, f"{image_name}_multi.mp4"), video, fps=30)

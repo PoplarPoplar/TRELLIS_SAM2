@@ -73,6 +73,7 @@ if __name__ == '__main__':
 
     # load model
     dinov2_model = torch.hub.load('facebookresearch/dinov2', opt.model)
+    #dinov2_model = torch.load('/home/liu/code/TRELLIS/path/to/dinov2_vitl14_reg4.pth', opt.model)
     dinov2_model.eval().cuda()
     transform = transforms.Compose([
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),

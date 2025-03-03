@@ -1,3 +1,6 @@
 [submodule "trellis/representations/mesh/flexicubes"]
 	path = trellis/representations/mesh/flexicubes
 	url = https://github.com/MaxtirError/FlexiCubes.git
+[submodule "path/submodule"]
+	path = path/submodule
+	url = https://github.com/PoplarPoplar/sam2.git
